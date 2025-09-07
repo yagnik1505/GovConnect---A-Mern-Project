@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { api } from "../utils/api";
 
 const emailRx = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -9,7 +9,6 @@ export default function Login() {
   const [errors, setErrors] = useState({});
   const [busy, setBusy] = useState(false);
   const navigate = useNavigate();
-  const location = useLocation();
 
   const set = (k, v) => setForm((f) => ({ ...f, [k]: v }));
 
@@ -24,20 +23,41 @@ export default function Login() {
   const submit = async (ev) => {
     ev.preventDefault();
     if (!validate()) return;
+
     setBusy(true);
-    const { res, data } = await api("/api/auth/login", {
-      method: "POST",
-      body: JSON.stringify(form),
-    });
-    setBusy(false);
-    if (!res.ok) {
-      setErrors({ api: data.message || "Invalid email or password" });
-      return;
+    try {
+      const { res, data } = await api("/api/auth/login", {
+        method: "POST",
+        body: JSON.stringify(form),
+      });
+      setBusy(false);
+
+      // Check for token and user securely
+      if (!res.ok || !data.token || !data.user) {
+        setErrors({ api: data?.message || "Invalid email or password" });
+        return;
+      }
+
+      // Defensive lowercasing and fallback for missing fields
+      const designation = (data.user.designation || "").toLowerCase();
+      const userType = (data.user.userType || "").toLowerCase();
+      const name = data.user.name || "";
+
+      localStorage.setItem("token", data.token);
+      localStorage.setItem(
+        "user",
+        JSON.stringify({ designation, userType, name })
+      );
+
+      if (designation === "admin") {
+        navigate("/admin/dashboard", { replace: true });
+      } else {
+        navigate("/dashboard", { replace: true });
+      }
+    } catch (error) {
+      setBusy(false);
+      setErrors({ api: "Network error or server unreachable" });
     }
-    localStorage.setItem("token", data.token);
-    localStorage.setItem("user", JSON.stringify(data.user));
-    const to = location.state?.from?.pathname || "/dashboard";
-    navigate(to, { replace: true });
   };
 
   return (

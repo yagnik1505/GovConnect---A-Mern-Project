@@ -1,39 +1,15 @@
-/* index.css — global styles */
+/* Only the active-link “blue box” and tiny helpers here to avoid overriding your pages */
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+.nav-links a.active {
+  background: #2563eb;
+  color: #fff !important;
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3);
+  padding: 0.4rem 0.9rem;
+  border-radius: 8px;
 }
 
-body {
-  font-family: 'Poppins', sans-serif;
-  background: #f4f6f8;
-  color: #333;
-}
-
-/* Navbar */
-nav {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem 2rem;
-  background: white;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-}
-
-nav ul {
-  display: flex;
-  list-style: none;
-  gap: 1.5rem;
-}
-
-nav a {
+/* Ensure brand never looks like a link */
+.navbar .logo {
   text-decoration: none;
-  color: #333;
-  font-weight: 500;
-}
-
-nav a:hover {
-  color: #007bff;
+  cursor: default;
 }

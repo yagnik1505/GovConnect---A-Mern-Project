@@ -10,11 +10,9 @@ router.post("/signup", async (req, res) => {
   try {
     const { name, email, password, userType, department, designation } = req.body;
 
-    // Check if email already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) return res.status(400).json({ message: "User already exists" });
 
-    // Prevent admin creation from signup
     if (designation && designation.toLowerCase() === "admin") {
       return res.status(400).json({ message: "You cannot create an admin through signup" });
     }
@@ -27,7 +25,7 @@ router.post("/signup", async (req, res) => {
       password: hashedPassword,
       userType,
       department,
-      designation: designation || "user" // default user if nothing provided
+      designation: designation || "user"
     });
 
     await user.save();
@@ -38,31 +36,46 @@ router.post("/signup", async (req, res) => {
 });
 
 // Login route
-router.post("/login", async (req, res) => {
+router.post("/login", async (req, res, next) => {
   try {
     const { email, password } = req.body;
 
     const user = await User.findOne({ email });
-    if (!user) return res.status(400).json({ message: "Invalid credentials" });
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User does not exist" });
+    }
 
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
+    console.log("Stored hash:", user.password);
+    const valid = await bcrypt.compare(password, user.password);
+    console.log("Password valid:", valid);
 
-    // Include designation in token payload
+    if (!valid) {
+      return res.status(401).json({ success: false, message: "Incorrect password" });
+    }
+
     const token = jwt.sign(
-      { id: user._id, designation: user.designation },
+      {
+        id: user._id,
+        designation: user.designation.toLowerCase(),
+        userType: user.userType.toLowerCase(),
+      },
       process.env.JWT_SECRET,
-      { expiresIn: "1h" }
+      { expiresIn: "1d" }
     );
 
     res.json({
+      success: true,
       token,
-      designation: user.designation,
-      userType: user.userType,
-      name: user.name
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        userType: user.userType.toLowerCase(),
+        designation: user.designation.toLowerCase(),
+      },
     });
   } catch (err) {
-    res.status(500).json({ message: "Server error" });
+    next(err);
   }
 });
 

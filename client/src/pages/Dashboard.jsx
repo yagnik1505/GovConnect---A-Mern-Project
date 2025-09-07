@@ -41,7 +41,7 @@ export default function Dashboard() {
       </h1>
       <p className="text-gray-600 mb-8">
         You are logged in as <strong>{user.userType}</strong>
-        {isGov && ` (${user.department} - ${user.designation})`}
+        {isGov && ` (${user.designation})`}
       </p>
 
       <div className="grid-3">

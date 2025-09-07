@@ -45,3 +45,7 @@ Try **Signup** then **Login**. A JWT token will be stored in `localStorage`.
 - Add image upload (e.g., Cloudinary).
 ```
 
+
+
+Admin -: yagnik@gmail.com
+Password :- yagnik1505

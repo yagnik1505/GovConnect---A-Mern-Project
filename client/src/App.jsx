@@ -8,19 +8,29 @@ import Schemes from "./pages/Schemes.jsx";
 import Scholarships from "./pages/Scholarships.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import AdminDashboard from "./pages/AdminDashboard.jsx";
+import SchemesForm from "./pages/SchemesForm.jsx";
+import "./style.css";
 
 export default function App() {
   return (
-    <div>
+    <div className="app">
       <Navbar />
-      <div className="container">
+      <main style={{ padding: "1.5rem" }}>
         <Routes>
+          {/* Public */}
           <Route path="/" element={<Home />} />
-          <Route path="/schemes" element={<Schemes />} />
-          <Route path="/scholarships" element={<Scholarships />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
 
+          {/* Protected */}
+          <Route
+          path="/admin/dashboard"
+          element={
+            <ProtectedRoute adminOnly>
+              <AdminDashboard />
+            </ProtectedRoute>
+          }
+          />
           <Route
             path="/dashboard"
             element={
@@ -29,19 +39,35 @@ export default function App() {
               </ProtectedRoute>
             }
           />
-
           <Route
-            path="/admin/dashboard"
+            path="/schemes"
             element={
-              <ProtectedRoute adminOnly>
-                <AdminDashboard />
+              <ProtectedRoute govOrAdminOnly>
+                <Schemes />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/schemes/add"
+            element={
+              <ProtectedRoute govOrAdminOnly>
+                <SchemesForm />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/scholarships"
+            element={
+              <ProtectedRoute govOrAdminOnly>
+                <Scholarships />
               </ProtectedRoute>
             }
           />
 
+          {/* Fallback */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
-      </div>
+      </main>
     </div>
   );
 }

@@ -1,39 +1,50 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 
 export default function Navbar() {
   const navigate = useNavigate();
-  const isAuthed = !!localStorage.getItem("token");
-  const user = JSON.parse(localStorage.getItem("user")) || {};
+  const location = useLocation();
+  const user = JSON.parse(localStorage.getItem("user") || "null");
 
-  const logout = () => {
-    localStorage.removeItem("token");
+  const isAdmin = user?.designation?.toLowerCase() === "admin";
+  const isGov   = user?.userType?.toLowerCase() === "government";
+
+  const handleLogout = () => {
     localStorage.removeItem("user");
+    localStorage.removeItem("token");
     navigate("/login");
   };
 
+  const isActive = (path) =>
+    location.pathname === path || location.pathname.startsWith(path);
+
   return (
-    <nav className="navbar">
+    <nav className="navbar">  
       <div className="logo">GovConnect</div>
       <div className="nav-links">
-        <Link to="/schemes">Schemes</Link>
-        <Link to="/scholarships">Scholarships</Link>
+        <Link to="/" className={isActive("/") && location.pathname === "/" ? "active" : ""}>Home</Link>
 
-        {/* Show Dashboard links based on role */}
-        {isAuthed && user.designation === "admin" ? (
-          <Link to="/admin/dashboard">Admin</Link>
-        ) : (
-          <Link to="/dashboard">Dashboard</Link>
-        )}
-
-        {!isAuthed ? (
+        {user ? (
           <>
-            <Link to="/login">Login</Link>
-            <Link to="/signup">Signup</Link>
+            <Link to="/dashboard" className={isActive("/dashboard") ? "active" : ""}>Dashboard</Link>
+
+            {(isGov || isAdmin) && (
+              <>
+                <Link to="/schemes" className={isActive("/schemes") ? "active" : ""}>Schemes</Link>
+                <Link to="/scholarships" className={isActive("/scholarships") ? "active" : ""}>Scholarships</Link>
+              </>
+            )}
+
+            {isAdmin && (
+              <Link to="/admin/dashboard" className={isActive("/admin") ? "active" : ""}>Admin Panel</Link>
+            )}
+
+            <button type="button" onClick={handleLogout} className="logout-btn">Logout</button>
           </>
         ) : (
-          <button className="logout-btn" onClick={logout}>
-            Logout
-          </button>
+          <>
+            <Link to="/login" className={isActive("/login") ? "active" : ""}>Login</Link>
+            <Link to="/signup" className={isActive("/signup") ? "active" : ""}>Signup</Link>
+          </>
         )}
       </div>
     </nav>

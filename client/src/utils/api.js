@@ -1,4 +1,5 @@
-// client/src/utils/api.js
+const BASE_URL = "http://localhost:5000"; // adjust URL if needed
+
 export async function api(path, options = {}) {
   const token = localStorage.getItem("token");
   const headers = {
@@ -7,7 +8,8 @@ export async function api(path, options = {}) {
     ...(options.headers || {}),
   };
 
-  const res = await fetch(path, { ...options, headers }); // 🚀 no BASE_URL
+  const res = await fetch(`${BASE_URL}${path}`, { ...options, headers });
   const data = await res.json().catch(() => ({}));
+
   return { res, data };
 }

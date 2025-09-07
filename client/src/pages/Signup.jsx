@@ -6,8 +6,12 @@ const emailRx = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function Signup() {
   const [form, setForm] = useState({
-    name: "", email: "", password: "",
-    userType: "Public", department: "", designation: "",
+    name: "",
+    email: "",
+    password: "",
+    userType: "Public",
+    department: "",
+    designation: "",
   });
   const [errors, setErrors] = useState({});
   const [busy, setBusy] = useState(false);
@@ -23,6 +27,9 @@ export default function Signup() {
     if (form.userType === "Government") {
       if (!form.department.trim()) e.department = "Department required";
       if (!form.designation.trim()) e.designation = "Designation required";
+      if (form.designation.trim().toLowerCase() === "admin") {
+        e.designation = "You cannot register as admin";
+      }
     }
     setErrors(e);
     return Object.keys(e).length === 0;
@@ -31,17 +38,27 @@ export default function Signup() {
   const submit = async (ev) => {
     ev.preventDefault();
     if (!validate()) return;
+
     setBusy(true);
-    const payload = { ...form };
-    const { res, data } = await api("/api/auth/register", {
+
+    const payload = {
+      ...form,
+      password: form.password.trim(),
+      userType: form.userType.toLowerCase(),
+    };
+
+    const { res, data } = await api("/api/auth/signup", {
       method: "POST",
       body: JSON.stringify(payload),
     });
+
     setBusy(false);
+
     if (!res.ok) {
       setErrors({ api: data.message || "Registration failed" });
       return;
     }
+
     alert("Signup successful! Please login.");
     navigate("/login");
   };
@@ -61,7 +78,7 @@ export default function Signup() {
               className={errors.name ? "input-error" : ""}
               value={form.name}
               onChange={(e) => set("name", e.target.value)}
-              placeholder="e.g. Ananya Sharma"
+              placeholder="e.g. Yagnik Pansheriya"
             />
             {errors.name && <p className="error-text">{errors.name}</p>}
           </div>
@@ -109,6 +126,7 @@ export default function Signup() {
                 />
                 {errors.department && <p className="error-text">{errors.department}</p>}
               </div>
+
               <div>
                 <label>Designation</label>
                 <input

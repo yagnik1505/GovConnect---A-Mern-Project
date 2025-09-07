@@ -7,6 +7,28 @@
     "client": "npm run dev --prefix client"
   },
   "devDependencies": {
-    "concurrently": "^8.2.2"
-  }
+    "autoprefixer": "^10.4.21",
+    "concurrently": "^8.2.2",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.1.12"
+  },
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "bcryptjs": "^3.0.2",
+    "cors": "^2.8.5"
+  },
+  "version": "1.0.0",
+  "description": "This is a minimal, working starter for your government portal project.",
+  "main": "hashPassword.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yagnik1505/GovConnect---A-Mern-Project.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/yagnik1505/GovConnect---A-Mern-Project/issues"
+  },
+  "homepage": "https://github.com/yagnik1505/GovConnect---A-Mern-Project#readme"
 }

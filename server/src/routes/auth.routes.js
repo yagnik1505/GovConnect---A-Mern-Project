@@ -5,75 +5,94 @@ import User from "../models/User.js";
 
 const router = express.Router();
 
-// Register (signup)
-router.post("/register", async (req, res) => {
+// 📌 SIGNUP
+router.post("/signup", async (req, res) => {
   try {
-    const { name, email, password, userType, department, designation } = req.body;
+    let { name, email, password, userType, department, designation } = req.body;
 
-    // 🚫 Prevent creating admin from signup
-    if (designation === "admin") {
-      return res.status(403).json({ success: false, message: "You cannot create admin via signup" });
+    // Check if user already exists
+    const existingUser = await User.findOne({ email: email.toLowerCase().trim() });
+    if (existingUser)
+      return res.status(400).json({ message: "User already exists" });
+
+    // Block creating admin via signup
+    if (designation?.toLowerCase() === "admin") {
+      return res
+        .status(400)
+        .json({ message: "You cannot create an admin through signup" });
     }
 
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.status(400).json({ success: false, message: "User already exists" });
-    }
+    // Default values & lowercase normalization
+    userType = (userType || "public").toLowerCase();
+    designation = (designation || "user").toLowerCase();
 
+    // ✅ Hash password manually
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const newUser = new User({
+    const user = new User({
       name,
-      email,
+      email: email.toLowerCase().trim(),
       password: hashedPassword,
       userType,
       department,
-      designation
+      designation,
     });
 
-    await newUser.save();
-    res.status(201).json({ success: true, message: "User registered successfully" });
-
+    await user.save();
+    res.status(201).json({ message: "User registered successfully" });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ success: false, message: "Server error" });
+    console.error("Signup error:", err);
+    res.status(500).json({ message: "Server error" });
   }
 });
 
-// Login
+// 📌 LOGIN
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const user = await User.findOne({ email });
-    if (!user) return res.status(400).json({ success: false, message: "Invalid credentials" });
+    console.log("Login attempt with email:", email);
+    console.log("Password received:", password);
 
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(400).json({ success: false, message: "Invalid credentials" });
+    const user = await User.findOne({ email: email.toLowerCase().trim() });
+    if (!user)
+      return res.status(404).json({ success: false, message: "User does not exist" });
 
-    // JWT token
+    console.log("Stored hashed password:", user.password);
+
+    // Compare password with bcrypt
+    const valid = await bcrypt.compare(password, user.password);
+    console.log("Password match result:", valid);
+
+    if (!valid)
+      return res.status(401).json({ success: false, message: "Incorrect password" });
+
+    // Generate JWT with designation & userType
     const token = jwt.sign(
-      { id: user._id, designation: user.designation },
-      process.env.JWT_SECRET || "secretkey",
-      { expiresIn: "1h" }
+      {
+        id: user._id,
+        designation: (user.designation || "user").toLowerCase(),
+        userType: (user.userType || "public").toLowerCase(),
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "1d" }
     );
 
     res.json({
       success: true,
       token,
       user: {
-        id: user._id,
+        _id: user._id,
         name: user.name,
         email: user.email,
-        designation: user.designation,
-        userType: user.userType
-      }
+        userType: (user.userType || "public").toLowerCase(),
+        designation: (user.designation || "user").toLowerCase(),
+      },
     });
-
   } catch (err) {
-    console.error(err);
+    console.error("Login error:", err);
     res.status(500).json({ success: false, message: "Server error" });
   }
 });
 
-export default router;  // ✅ ES Module export
+export default router;
