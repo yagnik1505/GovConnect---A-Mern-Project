@@ -7,16 +7,8 @@ const router = express.Router();
 // Create scholarship (Gov/Admin only)
 router.post("/", authMiddleware, govOrAdminMiddleware, async (req, res) => {
   try {
-    const {
-      title,
-      department,
-      eligibility,
-      applicationDeadline,
-      description,
-      amount,
-      status,
-    } = req.body;
-    
+    const { title, department, eligibility, applicationDeadline, description, amount, status } = req.body;
+
     const scholarship = new Scholarship({
       title,
       department,

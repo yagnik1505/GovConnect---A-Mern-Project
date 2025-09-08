@@ -7,8 +7,6 @@ const router = express.Router();
 // Create scheme (Gov/Admin only)
 router.post("/", authMiddleware, govOrAdminMiddleware, async (req, res) => {
   try {
-    console.log("Create scheme request body:", req.body); // Debug log
-    
     const { title, code, department, launchDate, description, status } = req.body;
     const scheme = new Scheme({
       title,
