@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { api } from "../utils/api";
 
-const ScholarshipForm = ({ onSuccess }) => {
+const ScholarshipForm = ({ scholarship, onSuccess, onCancel }) => {
   const [form, setForm] = useState({
     title: "",
     department: "",
@@ -13,6 +13,21 @@ const ScholarshipForm = ({ onSuccess }) => {
   });
 
   const [errors, setErrors] = useState({});
+
+  useEffect(() => {
+    if (scholarship) {
+      setForm({
+        title: scholarship.title || "",
+        department: scholarship.department || "",
+        eligibility: scholarship.eligibility || "",
+        applicationDeadline: scholarship.applicationDeadline ? scholarship.applicationDeadline.split("T")[0] : "",
+        description: scholarship.description || "",
+        amount: scholarship.amount || "",
+        status: scholarship.status || "open",
+      });
+      setErrors({});
+    }
+  }, [scholarship]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -45,34 +60,43 @@ const ScholarshipForm = ({ onSuccess }) => {
       status: form.status,
     };
 
-    const { res, data } = await api("/api/scholarships", {
-      method: "POST",
+    let url = "/api/scholarships";
+    let method = "POST";
+    if (scholarship && scholarship._id) {
+      url = `/api/scholarships/${scholarship._id}`;
+      method = "PUT";
+    }
+
+    const { res, data } = await api(url, {
+      method,
       body: JSON.stringify(payload),
     });
 
     if (!res.ok) {
-      alert(data?.message || "❌ Failed to add scholarship (must be Gov/Admin)");
+      alert(data?.message || `Failed to ${scholarship ? "update" : "add"} scholarship (must be Gov/Admin)`);
       return;
     }
 
-    alert("✅ Scholarship added successfully!");
+    alert(`✅ Scholarship ${scholarship ? "updated" : "added"} successfully!`);
     if (onSuccess) onSuccess();
 
-    setForm({
-      title: "",
-      department: "",
-      eligibility: "",
-      applicationDeadline: "",
-      description: "",
-      amount: "",
-      status: "open",
-    });
-    setErrors({});
+    if (!scholarship) {
+      setForm({
+        title: "",
+        department: "",
+        eligibility: "",
+        applicationDeadline: "",
+        description: "",
+        amount: "",
+        status: "open",
+      });
+      setErrors({});
+    }
   };
 
   return (
     <div className="form-container">
-      <h2 className="form-title">Add Scholarship</h2>
+      <h2 className="form-title">{scholarship ? "Update Scholarship" : "Add Scholarship"}</h2>
       <form onSubmit={handleSubmit} className="scholarship-form">
         <section>
           <label>Title *</label>
@@ -96,7 +120,13 @@ const ScholarshipForm = ({ onSuccess }) => {
           {errors.description && <p className="error-text">{errors.description}</p>}
 
           <label>Amount *</label>
-          <input type="number" name="amount" value={form.amount} onChange={handleChange} step="0.01" />
+          <input
+            type="number"
+            name="amount"
+            value={form.amount}
+            onChange={handleChange}
+            step="0.01"
+          />
           {errors.amount && <p className="error-text">{errors.amount}</p>}
 
           <label>Status</label>
@@ -106,7 +136,27 @@ const ScholarshipForm = ({ onSuccess }) => {
           </select>
         </section>
 
-        <button className="btn-submit" type="submit">Save Scholarship</button>
+        <button className="btn-submit" type="submit">{scholarship ? "Update" : "Save"} Scholarship</button>
+
+        {onCancel && (
+            <button
+              type="button"
+              onClick={onCancel}
+              style={{
+                marginTop: "1rem",
+                width: "fit-content",
+                padding: "0.8rem 1.5rem",    
+                backgroundColor: "#ccc",
+                border: "none",
+                borderRadius: "8px",
+                cursor: "pointer",
+                fontSize: "1.1rem",
+              }}
+            >
+              Cancel
+            </button>
+
+        )}
       </form>
     </div>
   );

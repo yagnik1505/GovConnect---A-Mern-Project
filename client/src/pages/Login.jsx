@@ -32,31 +32,36 @@ export default function Login() {
       });
       setBusy(false);
 
-      // Check for token and user securely
       if (!res.ok || !data.token || !data.user) {
-        setErrors({ api: data?.message || "Invalid email or password" });
+        setErrors({ api: data?.message || "Invalid credentials" });
         return;
       }
 
-      // Defensive lowercasing and fallback for missing fields
-      const designation = (data.user.designation || "").toLowerCase();
-      const userType = (data.user.userType || "").toLowerCase();
-      const name = data.user.name || "";
+      const userType = data.user.userType ? data.user.userType.toLowerCase() : "public";
+      const designation = data.user.designation ? data.user.designation.toLowerCase() : "user";
 
+      // Save both to localStorage for further use
       localStorage.setItem("token", data.token);
       localStorage.setItem(
         "user",
-        JSON.stringify({ designation, userType, name })
+        JSON.stringify({
+          userType,
+          designation,
+          name: data.user.name || "",
+          email: data.user.email || "",
+          id: data.user._id,
+        })
       );
 
-      if (designation === "admin") {
+      // Navigation based on the composite role
+      if (userType === "government" && designation === "admin") {
         navigate("/admin/dashboard", { replace: true });
       } else {
         navigate("/dashboard", { replace: true });
       }
-    } catch (error) {
+    } catch (err) {
       setBusy(false);
-      setErrors({ api: "Network error or server unreachable" });
+      setErrors({ api: "Network or server error" });
     }
   };
 

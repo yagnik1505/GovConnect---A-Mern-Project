@@ -1,14 +1,26 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { api } from "../utils/api";
 
-const SchemesForm = ({ onSuccess }) => {
+const SchemesForm = ({ scheme, onSuccess, onCancel }) => {
   const [form, setForm] = useState({
     title: "",
-    description: "",
     department: "",
     launchDate: "",
+    description: "",
     status: "active",
   });
+
+  useEffect(() => {
+    if (scheme) {
+      setForm({
+        title: scheme.title || "",
+        department: scheme.department || "",
+        launchDate: scheme.launchDate ? scheme.launchDate.split("T")[0] : "",
+        description: scheme.description || "",
+        status: scheme.status || "active",
+      });
+    }
+  }, [scheme]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -17,39 +29,40 @@ const SchemesForm = ({ onSuccess }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const payload = {
-      title: form.title,
-      department: form.department,
-      launchDate: form.launchDate,
-      description: form.description,
-      status: form.status,
-    };
+    const payload = { ...form };
 
-    const { res, data } = await api("/api/schemes", {
-      method: "POST",
-      body: JSON.stringify(payload),
-    });
+    let url = "/api/schemes";
+    let method = "POST";
+    if (scheme && scheme._id) {
+      url = `/api/schemes/${scheme._id}`;
+      method = "PUT";
+    }
+
+    const { res, data } = await api(url, { method, body: JSON.stringify(payload) });
 
     if (!res.ok) {
-      alert(data?.message || "❌ Failed to add scheme (must be Gov/Admin)");
+      alert(data?.message || `Failed to ${scheme ? "update" : "add"} scheme (must be Gov/Admin)`);
       return;
     }
 
-    alert("✅ Scheme added successfully!");
+    alert(`✅ Scheme ${scheme ? "updated" : "added"} successfully!`);
     if (onSuccess) onSuccess();
 
-    setForm({
-      title: "",
-      description: "",
-      department: "",
-      launchDate: "",
-      status: "active",
-    });
+    // Reset form on add
+    if (!scheme) {
+      setForm({
+        title: "",
+        department: "",
+        launchDate: "",
+        description: "",
+        status: "active",
+      });
+    }
   };
 
   return (
     <div className="form-container">
-      <h2 className="form-title">Add Scheme</h2>
+      <h2 className="form-title">{scheme ? "Update Scheme" : "Add Scheme"}</h2>
       <form onSubmit={handleSubmit} className="scheme-form">
         <section>
           <label>Title</label>
@@ -71,7 +84,27 @@ const SchemesForm = ({ onSuccess }) => {
           </select>
         </section>
 
-        <button className="btn-submit" type="submit">Save Scheme</button>
+        <button className="btn-submit" type="submit">{scheme ? "Update" : "Save"} Scheme</button>
+
+        {onCancel && (
+              <button
+                type="button"
+                onClick={onCancel}
+                style={{
+                  marginTop: "1rem",
+                  // marginLeft: "1rem",
+                  padding: "0.6rem 1rem",
+                  backgroundColor: "#ccc",
+                  border: "none",
+                  borderRadius: "8px",
+                  cursor: "pointer",
+                  fontSize: "1.1rem",
+                  padding: "0.8rem 1.5rem",  
+                }}
+              >
+                Cancel
+              </button>
+        )}
       </form>
     </div>
   );

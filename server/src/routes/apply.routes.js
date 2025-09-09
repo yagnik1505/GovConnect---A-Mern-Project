@@ -5,11 +5,22 @@ const router = express.Router();
 
 router.post("/", async (req, res) => {
   const { itemId, itemType, title, name, email } = req.body;
+
   if (!itemId || !itemType || !title || !name || !email) {
     return res.status(400).json({ success: false, message: "Missing required fields." });
   }
 
+  if (!["scheme", "scholarship"].includes(itemType)) {
+    return res.status(400).json({ success: false, message: "Invalid itemType." });
+  }
+
   try {
+    // Optional: Check for duplicate application by same user on same item
+    const existing = await Application.findOne({ itemId, itemType, email });
+    if (existing) {
+      return res.status(409).json({ success: false, message: "You have already applied for this item." });
+    }
+
     const application = new Application({ itemId, itemType, title, name, email });
     await application.save();
     return res.status(201).json({ success: true, message: "Application received.", application });

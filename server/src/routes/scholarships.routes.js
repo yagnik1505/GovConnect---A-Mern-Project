@@ -1,13 +1,22 @@
 import express from "express";
 import Scholarship from "../models/Scholarship.js";
 import { authMiddleware, govOrAdminMiddleware, adminMiddleware } from "../middleware/authMiddleware.js";
+import Application from "../models/Application.js";
 
 const router = express.Router();
 
 // Create scholarship (Gov/Admin only)
 router.post("/", authMiddleware, govOrAdminMiddleware, async (req, res) => {
   try {
-    const { title, department, eligibility, applicationDeadline, description, amount, status } = req.body;
+    const {
+      title,
+      department,
+      eligibility,
+      applicationDeadline,
+      description,
+      amount,
+      status,
+    } = req.body;
 
     const scholarship = new Scholarship({
       title,
@@ -72,6 +81,25 @@ router.delete("/:id", authMiddleware, adminMiddleware, async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ success: false, message: "Server error deleting scholarship" });
+  }
+});
+
+router.get("/", async (req, res) => {
+  try {
+    const scholarships = await Scholarship.find().sort({ createdAt: -1 });
+
+    // Add applicant count for each scholarship
+    const scholarshipsWithCount = await Promise.all(
+      scholarships.map(async (scholarship) => {
+        const count = await Application.countDocuments({ itemId: scholarship._id, itemType: "scholarship" });
+        return { ...scholarship.toObject(), applicantCount: count };
+      })
+    );
+
+    res.json({ success: true, scholarships: scholarshipsWithCount });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: "Server error fetching scholarships" });
   }
 });
 

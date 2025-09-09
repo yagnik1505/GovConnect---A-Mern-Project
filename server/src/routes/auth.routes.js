@@ -10,23 +10,22 @@ router.post("/signup", async (req, res) => {
   try {
     let { name, email, password, userType, department, designation } = req.body;
 
-    // Check if user already exists
+    // Validate existing user
     const existingUser = await User.findOne({ email: email.toLowerCase().trim() });
-    if (existingUser)
+    if (existingUser) {
       return res.status(400).json({ message: "User already exists" });
-
-    // Block creating admin via signup
-    if (designation?.toLowerCase() === "admin") {
-      return res
-        .status(400)
-        .json({ message: "You cannot create an admin through signup" });
     }
 
-    // Default values & lowercase normalization
+    // Prevent signup as admin
+    if (designation?.toLowerCase() === "admin") {
+      return res.status(400).json({ message: "You cannot create an admin through signup" });
+    }
+
+    // Normalize userType and designation to lowercase with default fallback
     userType = (userType || "public").toLowerCase();
     designation = (designation || "user").toLowerCase();
 
-    // ✅ Hash password manually
+    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = new User({
@@ -51,28 +50,23 @@ router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    console.log("Login attempt with email:", email);
-    console.log("Password received:", password);
-
     const user = await User.findOne({ email: email.toLowerCase().trim() });
-    if (!user)
+    if (!user) {
       return res.status(404).json({ success: false, message: "User does not exist" });
+    }
 
-    console.log("Stored hashed password:", user.password);
-
-    // Compare password with bcrypt
+    // Compare password
     const valid = await bcrypt.compare(password, user.password);
-    console.log("Password match result:", valid);
-
-    if (!valid)
+    if (!valid) {
       return res.status(401).json({ success: false, message: "Incorrect password" });
+    }
 
-    // Generate JWT with designation & userType
+    // Generate JWT including normalized userType and designation
     const token = jwt.sign(
       {
         id: user._id,
-        designation: (user.designation || "user").toLowerCase(),
         userType: (user.userType || "public").toLowerCase(),
+        designation: (user.designation || "user").toLowerCase(),
       },
       process.env.JWT_SECRET,
       { expiresIn: "1d" }
