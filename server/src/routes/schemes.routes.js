@@ -1,7 +1,9 @@
 import express from "express";
+import mongoose from "mongoose";
 import Scheme from "../models/Scheme.js";
-import { authMiddleware, govOrAdminMiddleware, adminMiddleware } from "../middleware/authMiddleware.js";
 import Application from "../models/Application.js";
+import { authMiddleware, govOrAdminMiddleware, adminMiddleware } from "../middleware/authMiddleware.js";
+
 const router = express.Router();
 
 // Create scheme (Gov/Admin only)
@@ -25,11 +27,22 @@ router.post("/", authMiddleware, govOrAdminMiddleware, async (req, res) => {
   }
 });
 
-// Get all schemes (public)
+// Get all schemes with applicant count (public)
 router.get("/", async (req, res) => {
   try {
     const schemes = await Scheme.find().sort({ createdAt: -1 });
-    res.json({ success: true, schemes });
+
+    const schemesWithCount = await Promise.all(
+      schemes.map(async (scheme) => {
+        const count = await Application.countDocuments({
+          itemId: new mongoose.Types.ObjectId(scheme._id),
+          itemType: "scheme",
+        });
+        return { ...scheme.toObject(), applicantCount: count };
+      })
+    );
+
+    res.json({ success: true, schemes: schemesWithCount });
   } catch (err) {
     console.error(err);
     res.status(500).json({ success: false, message: "Server error fetching schemes" });
@@ -69,25 +82,6 @@ router.delete("/:id", authMiddleware, adminMiddleware, async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ success: false, message: "Server error deleting scheme" });
-  }
-});
-
-router.get("/", async (req, res) => {
-  try {
-    const schemes = await Scheme.find().sort({ createdAt: -1 });
-
-    // Add applicant count for each scheme
-    const schemesWithCount = await Promise.all(
-      schemes.map(async (scheme) => {
-        const count = await Application.countDocuments({ itemId: scheme._id, itemType: "scheme" });
-        return { ...scheme.toObject(), applicantCount: count };
-      })
-    );
-
-    res.json({ success: true, schemes: schemesWithCount });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ success: false, message: "Server error fetching schemes" });
   }
 });
 

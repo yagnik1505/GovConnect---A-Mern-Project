@@ -63,6 +63,7 @@ export default function Schemes() {
         alert("Application submitted successfully!");
         setApplyingFor(null);
         setApplicationData({ name: "", email: "" });
+        loadSchemes(); // Reload schemes to update applicant count
       } else {
         alert(data.message || "Failed to submit application");
       }
@@ -87,7 +88,6 @@ export default function Schemes() {
     }
   };
 
-  // Update related handlers added without breaking styles
   const handleEditClick = (scheme) => {
     setEditingScheme(scheme);
     setShowForm(true);
@@ -114,23 +114,21 @@ export default function Schemes() {
       </h1>
 
       <div style={{ maxWidth: "1400px", margin: "0 auto" }}>
-        <button
-          className="add-btn"
-          style={{ width: "100%", borderRadius: "1.3rem", fontSize: "1.4rem", marginBottom: "2.5rem" }}
-          onClick={() => {
-            setEditingScheme(null);
-            setShowForm(!showForm);
-          }}
-        >
-          {showForm ? "Cancel" : "➕ Add Scheme"}
-        </button>
+        {(userRole === "admin" || userRole === "government") && (
+          <button
+            className="add-btn"
+            style={{ width: "100%", borderRadius: "1.3rem", fontSize: "1.4rem", marginBottom: "2rem" }}
+            onClick={() => {
+              setEditingScheme(null);
+              setShowForm(!showForm);
+            }}
+          >
+            {showForm ? "Cancel" : "➕ Add Scheme"}
+          </button>
+        )}
 
         {showForm && (
-          <SchemesForm
-            onCancel={handleFormCancel}
-            onSuccess={handleFormSuccess}
-            scheme={editingScheme}
-          />
+          <SchemesForm onCancel={handleFormCancel} onSuccess={handleFormSuccess} scheme={editingScheme} />
         )}
 
         <div className="schemes-wide-container">

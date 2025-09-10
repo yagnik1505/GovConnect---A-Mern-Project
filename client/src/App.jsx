@@ -24,12 +24,12 @@ export default function App() {
 
           {/* Protected */}
           <Route
-          path="/admin/dashboard"
-          element={
-            <ProtectedRoute adminOnly>
-              <AdminDashboard />
-            </ProtectedRoute>
-          }
+            path="/admin/dashboard"
+            element={
+              <ProtectedRoute adminOnly>
+                <AdminDashboard />
+              </ProtectedRoute>
+            }
           />
           <Route
             path="/dashboard"
@@ -39,14 +39,12 @@ export default function App() {
               </ProtectedRoute>
             }
           />
-          <Route
-            path="/schemes"
-            element={
-              <ProtectedRoute govOrAdminOnly>
-                <Schemes />
-              </ProtectedRoute>
-            }
-          />
+
+          {/* Public access to schemes and scholarships listing */}
+          <Route path="/schemes" element={<Schemes />} />
+          <Route path="/scholarships" element={<Scholarships />} />
+
+          {/* Protected management routes */}
           <Route
             path="/schemes/add"
             element={
@@ -56,10 +54,10 @@ export default function App() {
             }
           />
           <Route
-            path="/scholarships"
+            path="/scholarships/add"
             element={
               <ProtectedRoute govOrAdminOnly>
-                <Scholarships />
+                {/* ScholarshipForm if separate */}
               </ProtectedRoute>
             }
           />

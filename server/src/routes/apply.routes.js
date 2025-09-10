@@ -1,4 +1,5 @@
 import express from "express";
+import mongoose from "mongoose";
 import Application from "../models/Application.js";
 
 const router = express.Router();
@@ -15,13 +16,14 @@ router.post("/", async (req, res) => {
   }
 
   try {
-    // Optional: Check for duplicate application by same user on same item
-    const existing = await Application.findOne({ itemId, itemType, email });
+    const objectId = new mongoose.Types.ObjectId(itemId);
+
+    const existing = await Application.findOne({ itemId: objectId, itemType, email });
     if (existing) {
       return res.status(409).json({ success: false, message: "You have already applied for this item." });
     }
 
-    const application = new Application({ itemId, itemType, title, name, email });
+    const application = new Application({ itemId: objectId, itemType, title, name, email });
     await application.save();
     return res.status(201).json({ success: true, message: "Application received.", application });
   } catch (err) {

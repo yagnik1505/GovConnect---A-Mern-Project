@@ -10,24 +10,24 @@ export default function Dashboard() {
     {
       title: "Available Schemes",
       desc: "View and apply for government schemes available to you.",
-      id: "schemes-section",
+      link: "/schemes",
     },
     {
       title: "Scholarships",
       desc: "Browse scholarships and eligibility criteria for students.",
-      id: "scholarships-section",
+      link: "/scholarships",
     },
     {
       title: "Profile",
       desc: "Manage your personal details and preferences.",
-      id: "profile-section",
+      link: "/profile",
     },
   ];
 
   const governmentPanels = [
     {
       title: "Manage Schemes",
-      desc: "Add, edit, or remove government schemes assigned to your department.",
+      desc: "Add, edit, remove government schemes assigned to your department.",
     },
     {
       title: "Review Applications",
@@ -41,8 +41,8 @@ export default function Dashboard() {
 
   const panels = isGov ? governmentPanels : publicPanels;
 
-  const handleNavigate = (sectionId) => {
-    navigate("/dashboard", { state: { scrollTo: sectionId } });
+  const handleNavigate = (panel) => {
+    if (panel.link) navigate(panel.link);
   };
 
   return (
@@ -52,17 +52,16 @@ export default function Dashboard() {
         You are logged in as <strong>{user.userType}</strong>
         {isGov && ` (${user.designation})`}
       </p>
-
       <div className="grid-3">
         {panels.map((panel) => (
           <div
             key={panel.title}
             className={`panel ${isGov ? "panel-government" : "panel-public"}`}
-            style={{ cursor: panel.id ? "pointer" : undefined }}
-            onClick={() => panel.id && handleNavigate(panel.id)}
+            style={{ cursor: panel.link ? "pointer" : undefined }}
+            onClick={() => handleNavigate(panel)}
           >
             <h2 className="text-xl font-semibold mb-2">{panel.title}</h2>
-            <p className="text-gray-700">{panel.desc}</p>
+            <p>{panel.desc}</p>
           </div>
         ))}
       </div>

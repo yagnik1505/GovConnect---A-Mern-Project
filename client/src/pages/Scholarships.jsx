@@ -25,7 +25,7 @@ export default function Scholarships() {
     try {
       const token = localStorage.getItem("token");
       if (token) {
-        const payload = JSON.parse(atob(token.split('.')[1]));
+        const payload = JSON.parse(atob(token.split(".")[1]));
         const userType = (payload.userType || "").toLowerCase().trim();
         const designation = (payload.designation || "").toLowerCase().trim();
         let role = "public";
@@ -65,6 +65,7 @@ export default function Scholarships() {
         alert("Application submitted successfully!");
         setApplyingFor(null);
         setApplicationData({ name: "", email: "" });
+        loadScholarships(); // Reload to update applicant count
       } else {
         alert(data?.message || "Failed to submit application.");
       }
@@ -90,7 +91,6 @@ export default function Scholarships() {
     }
   };
 
-  // Update handlers
   const handleEditClick = (scholarship) => {
     setEditingScholarship(scholarship);
     setShowForm(true);
@@ -117,23 +117,21 @@ export default function Scholarships() {
       </h1>
 
       <div style={{ maxWidth: "1400px", margin: "0 auto" }}>
-        <button
-          className="add-btn"
-          style={{ width: "100%", borderRadius: "1.3rem", fontSize: "1.4rem", marginBottom: "2.5rem" }}
-          onClick={() => {
-            setEditingScholarship(null);
-            setShowForm(!showForm);
-          }}
-        >
-          {showForm && !editingScholarship ? "Cancel" : "➕ Add Scholarship"}
-        </button>
+        {(userRole === "admin" || userRole === "government") && (
+          <button
+            className="add-btn"
+            style={{ width: "100%", borderRadius: "1.3rem", fontSize: "1.4rem", marginBottom: "2rem" }}
+            onClick={() => {
+              setEditingScholarship(null);
+              setShowForm(!showForm);
+            }}
+          >
+            {showForm ? "Cancel" : "➕ Add Scholarship"}
+          </button>
+        )}
 
         {showForm && (
-          <ScholarshipForm
-            onSuccess={handleFormSuccess}
-            onCancel={handleFormCancel}
-            scholarship={editingScholarship}
-          />
+          <ScholarshipForm onSuccess={handleFormSuccess} onCancel={handleFormCancel} scholarship={editingScholarship} />
         )}
 
         <div className="scholarships-wide-container">
@@ -164,6 +162,11 @@ export default function Scholarships() {
                 <div>
                   <span className="label">Status:</span> {s.status}
                 </div>
+                {(isAdmin || isGov) && (
+                  <div>
+                    <span className="label">Applicants:</span> {s.applicantCount || 0}
+                  </div>
+                )}
               </div>
 
               <div style={{ display: "flex", gap: "0.8rem", marginTop: "1rem" }}>

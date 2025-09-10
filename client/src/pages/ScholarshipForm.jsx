@@ -94,43 +94,48 @@ const ScholarshipForm = ({ scholarship, onSuccess, onCancel }) => {
     }
   };
 
+  // Added style object for labels and inputs for spacing
+  const labelStyle = { marginBottom: "0.3px", display: "block" };
+  const inputStyle = { marginTop: "0.3rem" , marginBottom: "0.8rem", width: "100%", padding: "0.5rem", fontSize: "1rem" };
+
   return (
     <div className="form-container">
       <h2 className="form-title">{scholarship ? "Update Scholarship" : "Add Scholarship"}</h2>
       <form onSubmit={handleSubmit} className="scholarship-form">
         <section>
-          <label>Title *</label>
-          <input name="title" value={form.title} onChange={handleChange} />
+          <label style={labelStyle}>Title *</label>
+          <input name="title" value={form.title} onChange={handleChange} style={inputStyle} />
           {errors.title && <p className="error-text">{errors.title}</p>}
 
-          <label>Department *</label>
-          <input name="department" value={form.department} onChange={handleChange} />
+          <label style={labelStyle}>Department *</label>
+          <input name="department" value={form.department} onChange={handleChange} style={inputStyle} />
           {errors.department && <p className="error-text">{errors.department}</p>}
 
-          <label>Eligibility *</label>
-          <input name="eligibility" value={form.eligibility} onChange={handleChange} />
+          <label style={labelStyle}>Eligibility *</label>
+          <input name="eligibility" value={form.eligibility} onChange={handleChange} style={inputStyle} />
           {errors.eligibility && <p className="error-text">{errors.eligibility}</p>}
 
-          <label>Application Deadline *</label>
-          <input type="date" name="applicationDeadline" value={form.applicationDeadline} onChange={handleChange} />
+          <label style={labelStyle}>Application Deadline *</label>
+          <input type="date" name="applicationDeadline" value={form.applicationDeadline} onChange={handleChange} style={inputStyle} />
           {errors.applicationDeadline && <p className="error-text">{errors.applicationDeadline}</p>}
 
-          <label>Description *</label>
-          <textarea name="description" value={form.description} onChange={handleChange} />
+          <label style={labelStyle}>Description *</label>
+          <textarea name="description" value={form.description} onChange={handleChange} style={inputStyle} />
           {errors.description && <p className="error-text">{errors.description}</p>}
 
-          <label>Amount *</label>
+          <label style={labelStyle}>Amount *</label>
           <input
             type="number"
             name="amount"
             value={form.amount}
             onChange={handleChange}
             step="0.01"
+            style={inputStyle}
           />
           {errors.amount && <p className="error-text">{errors.amount}</p>}
 
-          <label>Status</label>
-          <select name="status" value={form.status} onChange={handleChange}>
+          <label style={labelStyle}>Status</label>
+          <select name="status" value={form.status} onChange={handleChange} style={inputStyle}>
             <option value="open">Open</option>
             <option value="closed">Closed</option>
           </select>
@@ -139,23 +144,22 @@ const ScholarshipForm = ({ scholarship, onSuccess, onCancel }) => {
         <button className="btn-submit" type="submit">{scholarship ? "Update" : "Save"} Scholarship</button>
 
         {onCancel && (
-            <button
-              type="button"
-              onClick={onCancel}
-              style={{
-                marginTop: "1rem",
-                width: "fit-content",
-                padding: "0.8rem 1.5rem",    
-                backgroundColor: "#ccc",
-                border: "none",
-                borderRadius: "8px",
-                cursor: "pointer",
-                fontSize: "1.1rem",
-              }}
-            >
-              Cancel
-            </button>
-
+          <button
+            type="button"
+            onClick={onCancel}
+            style={{
+              marginTop: "1rem",
+              width: "fit-content",
+              padding: "0.8rem 1.5rem",
+              backgroundColor: "#ccc",
+              border: "none",
+              borderRadius: "8px",
+              cursor: "pointer",
+              fontSize: "1.1rem",
+            }}
+          >
+            Cancel
+          </button>
         )}
       </form>
     </div>
