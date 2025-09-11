@@ -802,3 +802,31 @@ body {
   margin-right: 0.4rem;
 }
 
+/* Badges for crisis list */
+.badge {
+  display: inline-block;
+  padding: 0.25rem 0.6rem;
+  border-radius: 9999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  background: #e5e7eb;
+  color: #111827;
+}
+
+.badge-status-pending { background: #fef3c7; color: #92400e; }
+.badge-status-completed { background: #dcfce7; color: #065f46; }
+
+.badge-priority-low { background: #e0e7ff; color: #3730a3; }
+.badge-priority-medium { background: #fee2e2; color: #991b1b; }
+.badge-priority-high { background: #fecaca; color: #7f1d1d; }
+
+.img-thumb {
+  max-width: 280px;
+  max-height: 180px;
+  width: auto;
+  height: auto;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+  border: 1px solid #e5e7eb;
+}
+

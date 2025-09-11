@@ -2,11 +2,17 @@ import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import cors from "cors";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 import authRoutes from "./routes/auth.routes.js";
 import schemesRoutes from "./routes/schemes.routes.js";       // Note: corrected filename to 'scheme.routes.js'
 import scholarshipsRoutes from "./routes/scholarships.routes.js"; // corrected name to 'scholarship.routes.js'
 import applyRoutes from "./routes/apply.routes.js";
+import crisesRoutes from "./routes/crises.routes.js";
 
 import { authMiddleware, adminMiddleware } from "./middleware/authMiddleware.js";
 
@@ -16,6 +22,9 @@ const app = express();
 // CORS & JSON parsing middleware
 app.use(cors({ origin: "http://localhost:5173" }));
 app.use(express.json());
+
+// Static uploads directory
+app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 
 // Public routes
 app.use("/api/auth", authRoutes);
@@ -33,6 +42,7 @@ app.get("/api/profile", authMiddleware, (req, res) => {
 app.use("/api/schemes", schemesRoutes);
 app.use("/api/scholarships", scholarshipsRoutes);
 app.use("/api/apply", applyRoutes);
+app.use("/api/crises", crisesRoutes);
 
 // Connect to MongoDB and start server
 mongoose

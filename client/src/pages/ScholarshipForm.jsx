@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { api } from "../utils/api";
+import { useNavigate } from "react-router-dom";
 
 const ScholarshipForm = ({ scholarship, onSuccess, onCancel }) => {
   const [form, setForm] = useState({
@@ -13,6 +14,7 @@ const ScholarshipForm = ({ scholarship, onSuccess, onCancel }) => {
   });
 
   const [errors, setErrors] = useState({});
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (scholarship) {
@@ -80,18 +82,8 @@ const ScholarshipForm = ({ scholarship, onSuccess, onCancel }) => {
     alert(`✅ Scholarship ${scholarship ? "updated" : "added"} successfully!`);
     if (onSuccess) onSuccess();
 
-    if (!scholarship) {
-      setForm({
-        title: "",
-        department: "",
-        eligibility: "",
-        applicationDeadline: "",
-        description: "",
-        amount: "",
-        status: "open",
-      });
-      setErrors({});
-    }
+    // Redirect to listing
+    navigate("/scholarships", { replace: true });
   };
 
   // Added style object for labels and inputs for spacing

@@ -1,9 +1,10 @@
-const BASE_URL = "http://localhost:5000"; // adjust URL if needed
+export const BASE_URL = "http://localhost:5000"; // adjust URL if needed
 
 export async function api(path, options = {}) {
   const token = localStorage.getItem("token");
+  const isFormData = options && options.body instanceof FormData;
   const headers = {
-    "Content-Type": "application/json",
+    ...(isFormData ? {} : { "Content-Type": "application/json" }),
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
     ...(options.headers || {}),
   };

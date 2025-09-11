@@ -9,6 +9,7 @@ import Scholarships from "./pages/Scholarships.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import AdminDashboard from "./pages/AdminDashboard.jsx";
 import SchemesForm from "./pages/SchemesForm.jsx";
+import ScholarshipForm from "./pages/ScholarshipForm.jsx";
 import "./style.css";
 
 export default function App() {
@@ -57,7 +58,7 @@ export default function App() {
             path="/scholarships/add"
             element={
               <ProtectedRoute govOrAdminOnly>
-                {/* ScholarshipForm if separate */}
+                <ScholarshipForm />
               </ProtectedRoute>
             }
           />

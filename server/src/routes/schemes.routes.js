@@ -10,11 +10,21 @@ const router = express.Router();
 router.post("/", authMiddleware, govOrAdminMiddleware, async (req, res) => {
   try {
     const { title, code, department, launchDate, description, status } = req.body;
+
+    if (!title || !department || !launchDate || !description) {
+      return res.status(400).json({ success: false, message: "Missing required fields" });
+    }
+
+    const parsedDate = new Date(launchDate);
+    if (isNaN(parsedDate.getTime())) {
+      return res.status(400).json({ success: false, message: "Invalid launchDate" });
+    }
+
     const scheme = new Scheme({
       title,
       code,
       department,
-      launchDate,
+      launchDate: parsedDate,
       description,
       status,
       createdBy: req.user.id,
@@ -64,7 +74,15 @@ router.get("/:id", async (req, res) => {
 // Update scheme (Gov/Admin only)
 router.put("/:id", authMiddleware, govOrAdminMiddleware, async (req, res) => {
   try {
-    const updated = await Scheme.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const body = { ...req.body };
+    if (body.launchDate) {
+      const d = new Date(body.launchDate);
+      if (isNaN(d.getTime())) {
+        return res.status(400).json({ success: false, message: "Invalid launchDate" });
+      }
+      body.launchDate = d;
+    }
+    const updated = await Scheme.findByIdAndUpdate(req.params.id, body, { new: true });
     if (!updated) return res.status(404).json({ success: false, message: "Scheme not found" });
     res.json({ success: true, scheme: updated });
   } catch (err) {

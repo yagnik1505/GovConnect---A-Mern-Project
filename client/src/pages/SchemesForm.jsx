@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { api } from "../utils/api";
+import { useNavigate } from "react-router-dom";
 
 const SchemesForm = ({ scheme, onSuccess, onCancel }) => {
   const [form, setForm] = useState({
@@ -9,6 +10,7 @@ const SchemesForm = ({ scheme, onSuccess, onCancel }) => {
     description: "",
     status: "active",
   });
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (scheme) {
@@ -48,16 +50,8 @@ const SchemesForm = ({ scheme, onSuccess, onCancel }) => {
     alert(`✅ Scheme ${scheme ? "updated" : "added"} successfully!`);
     if (onSuccess) onSuccess();
 
-    // Reset form on add
-    if (!scheme) {
-      setForm({
-        title: "",
-        department: "",
-        launchDate: "",
-        description: "",
-        status: "active",
-      });
-    }
+    // Redirect to listing
+    navigate("/schemes", { replace: true });
   };
 
   return (
