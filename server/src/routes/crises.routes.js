@@ -125,4 +125,47 @@ router.patch("/:id/status", authMiddleware, governmentEmployeeOnly, async (req, 
   }
 });
 
+// Get crisis statistics for charts (public endpoint)
+router.get("/stats", async (req, res) => {
+  try {
+    // Get crisis type distribution
+    const crisisTypeStats = await Crisis.aggregate([
+      {
+        $group: {
+          _id: "$category",
+          count: { $sum: 1 }
+        }
+      },
+      {
+        $sort: { count: -1 }
+      }
+    ]);
+
+    // Get solved vs unsolved crisis stats
+    const solvedStats = await Crisis.aggregate([
+      {
+        $group: {
+          _id: "$status",
+          count: { $sum: 1 }
+        }
+      }
+    ]);
+
+    // Get total crisis count
+    const totalCrises = await Crisis.countDocuments();
+
+    res.json({
+      success: true,
+      stats: {
+        crisisTypes: crisisTypeStats,
+        solvedStatus: solvedStats,
+        totalCrises
+      }
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: "Failed to fetch crisis statistics" });
+  }
+});
+
 export default router; 

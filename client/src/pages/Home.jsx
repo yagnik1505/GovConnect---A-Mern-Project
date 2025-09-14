@@ -1,5 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import CrisisStats from "../components/CrisisStats";
+import GovernmentStats from "../components/GovernmentStats";
 
 function Home() {
   const navigate = useNavigate();
@@ -45,6 +47,13 @@ function Home() {
             </div>
           ))}
         </div>
+      )}
+
+      {/* Crisis Statistics Charts - Different views for different user types */}
+      {isGovEmployee ? (
+        <GovernmentStats />
+      ) : (
+        <CrisisStats />
       )}
     </div>
   );
