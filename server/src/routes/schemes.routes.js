@@ -20,15 +20,21 @@ router.post("/", authMiddleware, govOrAdminMiddleware, async (req, res) => {
       return res.status(400).json({ success: false, message: "Invalid launchDate" });
     }
 
-    const scheme = new Scheme({
+    const schemeData = {
       title,
-      code,
       department,
       launchDate: parsedDate,
       description,
       status,
       createdBy: req.user.id,
-    });
+    };
+
+    // Only include code if it's provided and not empty
+    if (code && code.trim() !== '') {
+      schemeData.code = code.trim();
+    }
+
+    const scheme = new Scheme(schemeData);
     await scheme.save();
     res.status(201).json({ success: true, scheme });
   } catch (err) {
@@ -82,6 +88,17 @@ router.put("/:id", authMiddleware, govOrAdminMiddleware, async (req, res) => {
       }
       body.launchDate = d;
     }
+
+    // Handle code field properly - only include if provided and not empty
+    if (body.code !== undefined) {
+      if (body.code && body.code.trim() !== '') {
+        body.code = body.code.trim();
+      } else {
+        // Remove the code field if it's empty or null
+        delete body.code;
+      }
+    }
+
     const updated = await Scheme.findByIdAndUpdate(req.params.id, body, { new: true });
     if (!updated) return res.status(404).json({ success: false, message: "Scheme not found" });
     res.json({ success: true, scheme: updated });

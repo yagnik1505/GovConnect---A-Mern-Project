@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 const SchemesForm = ({ scheme, onSuccess, onCancel }) => {
   const [form, setForm] = useState({
     title: "",
+    code: "",
     department: "",
     launchDate: "",
     description: "",
@@ -16,6 +17,7 @@ const SchemesForm = ({ scheme, onSuccess, onCancel }) => {
     if (scheme) {
       setForm({
         title: scheme.title || "",
+        code: scheme.code || "",
         department: scheme.department || "",
         launchDate: scheme.launchDate ? scheme.launchDate.split("T")[0] : "",
         description: scheme.description || "",
@@ -61,6 +63,9 @@ const SchemesForm = ({ scheme, onSuccess, onCancel }) => {
         <section>
           <label>Title</label>
           <input name="title" value={form.title} onChange={handleChange} required />
+
+          <label>Code (Optional)</label>
+          <input name="code" value={form.code} onChange={handleChange} placeholder="Enter scheme code" />
 
           <label>Department</label>
           <input name="department" value={form.department} onChange={handleChange} required />
