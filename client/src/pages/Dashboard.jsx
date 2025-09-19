@@ -112,7 +112,7 @@ export default function Dashboard() {
   return (
     <div className="container" style={{ paddingTop: "1rem" }}>
       <h1 className="text-3xl font-bold mb-6">Welcome, {user.name || "User"}!</h1>
-      <p className="text-gray-600 mb-8">
+      <p className="text-gray-600 mb-8" style={{marginBottom: "2rem"}}>
         You are logged in as <strong>{(user.userType || "").toLowerCase()}</strong>
         {user.userType && ` (${(user.designation || "").toLowerCase()})`}
       </p>

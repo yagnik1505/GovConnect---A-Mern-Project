@@ -122,24 +122,65 @@ const CrisisStats = () => {
 
   const crisisTypeOptions = {
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
       legend: {
         position: 'top',
+        labels: {
+          font: {
+            size: 14,
+            weight: '600',
+            family: "'Inter', 'Poppins', sans-serif"
+          },
+          padding: 20,
+          usePointStyle: true,
+          pointStyle: 'circle'
+        }
       },
       title: {
         display: true,
         text: 'Crisis Types Distribution',
         font: {
-          size: 16,
-          weight: 'bold'
+          size: 18,
+          weight: '700',
+          family: "'Inter', 'Poppins', sans-serif"
+        },
+        color: '#1f2937',
+        padding: {
+          top: 20,
+          bottom: 30
         }
       },
     },
     scales: {
+      x: {
+        ticks: {
+          font: {
+            size: 12,
+            weight: '500',
+            family: "'Inter', 'Poppins', sans-serif"
+          },
+          color: '#6b7280'
+        },
+        grid: {
+          color: '#e5e7eb',
+          drawBorder: false
+        }
+      },
       y: {
         beginAtZero: true,
         ticks: {
-          stepSize: 1
+          stepSize: 1,
+          font: {
+            size: 12,
+            weight: '500',
+            family: "'Inter', 'Poppins', sans-serif"
+          },
+          color: '#6b7280'
+        },
+        grid: {
+          color: '#e5e7eb',
+          drawBorder: false
         }
       }
     },
@@ -147,16 +188,33 @@ const CrisisStats = () => {
 
   const solvedOptions = {
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
       legend: {
         position: 'bottom',
+        labels: {
+          font: {
+            size: 14,
+            weight: '600',
+            family: "'Inter', 'Poppins', sans-serif"
+          },
+          padding: 20,
+          usePointStyle: true,
+          pointStyle: 'circle'
+        }
       },
       title: {
         display: true,
         text: 'Crisis Resolution Status',
         font: {
-          size: 16,
-          weight: 'bold'
+          size: 18,
+          weight: '700',
+          family: "'Inter', 'Poppins', sans-serif"
+        },
+        color: '#1f2937',
+        padding: {
+          top: 20,
+          bottom: 30
         }
       },
     },

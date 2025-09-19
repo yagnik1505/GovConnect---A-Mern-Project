@@ -38,28 +38,25 @@ export default function Navbar() {
       <div className="nav-links">
         <Link to="/" style={isActive("/") ? activeBoxStyle : undefined}>Home</Link>
 
+        {/* Schemes and Scholarships are visible to everyone */}
+        <Link
+          to="/schemes"
+          style={isActive("/schemes") ? activeBoxStyle : undefined}
+        >
+          Schemes
+        </Link>
+        <Link
+          to="/scholarships"
+          style={isActive("/scholarships") ? activeBoxStyle : undefined}
+        >
+          Scholarships
+        </Link>
+
         {user ? (
           <>
             <Link to="/dashboard" style={isActive("/dashboard") ? activeBoxStyle : undefined}>
               Dashboard
             </Link>
-
-            {(isGov || isAdmin) && (
-              <>
-                <Link
-                  to="/schemes"
-                  style={isActive("/schemes") ? activeBoxStyle : undefined}
-                >
-                  Schemes
-                </Link>
-                <Link
-                  to="/scholarships"
-                  style={isActive("/scholarships") ? activeBoxStyle : undefined}
-                >
-                  Scholarships
-                </Link>
-              </>
-            )}
 
             {isAdmin && (
               <Link to="/admin/dashboard" style={isActive("/admin") ? activeBoxStyle : undefined}>

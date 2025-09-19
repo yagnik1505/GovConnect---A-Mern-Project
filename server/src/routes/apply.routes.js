@@ -1,10 +1,11 @@
 import express from "express";
 import mongoose from "mongoose";
 import Application from "../models/Application.js";
+import { authMiddleware } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-router.post("/", async (req, res) => {
+router.post("/", authMiddleware, async (req, res) => {
   const { itemId, itemType, title, name, email } = req.body;
 
   if (!itemId || !itemType || !title || !name || !email) {

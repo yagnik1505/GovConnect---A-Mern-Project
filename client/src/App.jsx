@@ -18,12 +18,14 @@ export default function App() {
       <Navbar />
       <main style={{ padding: "1.5rem" }}>
         <Routes>
-          {/* Public */}
+          {/* Public - Only Home, Login, Signup, Schemes, and Scholarships viewing */}
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/schemes" element={<Schemes />} />
+          <Route path="/scholarships" element={<Scholarships />} />
 
-          {/* Protected */}
+          {/* Protected - All other routes require authentication */}
           <Route
             path="/admin/dashboard"
             element={
@@ -40,10 +42,6 @@ export default function App() {
               </ProtectedRoute>
             }
           />
-
-          {/* Public access to schemes and scholarships listing */}
-          <Route path="/schemes" element={<Schemes />} />
-          <Route path="/scholarships" element={<Scholarships />} />
 
           {/* Protected management routes */}
           <Route
