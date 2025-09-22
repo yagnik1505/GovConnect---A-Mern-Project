@@ -197,31 +197,45 @@ export default function Scholarships() {
               </div>
 
               <div style={{ display: "flex", gap: "0.8rem", marginTop: "1rem" }}>
-                <button
-                  type="button"
-                  className="apply-btn"
-                  style={{
-                    padding: "0.6rem 1.2rem",
-                    borderRadius: "1.3rem",
-                    border: "none",
-                    background: isLoggedIn ? "#3b82f6" : "#9ca3af",
-                    color: "white",
-                    cursor: isLoggedIn ? "pointer" : "not-allowed",
-                    fontWeight: "600",
-                    fontSize: "1rem",
-                    flexGrow: 1,
-                  }}
-                  onClick={() => {
-                    if (isLoggedIn) {
-                      setApplyingFor(s);
-                    } else {
-                      alert("Please login to apply for scholarships");
-                    }
-                  }}
-                  disabled={!isLoggedIn}
-                >
-                  {isLoggedIn ? "Apply Now" : "Login to Apply"}
-                </button>
+                {(() => {
+                  const canApply = isLoggedIn && s.status === "open";
+                  const btnLabel = !isLoggedIn
+                    ? "Login to Apply"
+                    : s.status !== "open"
+                    ? "Closed"
+                    : "Apply Now";
+                  return (
+                    <button
+                      type="button"
+                      className="apply-btn"
+                      style={{
+                        padding: "0.6rem 1.2rem",
+                        borderRadius: "1.3rem",
+                        border: "none",
+                        background: canApply ? "#3b82f6" : "#9ca3af",
+                        color: "white",
+                        cursor: canApply ? "pointer" : "not-allowed",
+                        fontWeight: "600",
+                        fontSize: "1rem",
+                        flexGrow: 1,
+                      }}
+                      onClick={() => {
+                        if (canApply) {
+                          setApplyingFor(s);
+                        } else {
+                          if (!isLoggedIn) {
+                            alert("Please login to apply for scholarships");
+                          } else if (s.status !== "open") {
+                            alert("This scholarship is closed. Applications are not allowed.");
+                          }
+                        }
+                      }}
+                      disabled={!canApply}
+                    >
+                      {btnLabel}
+                    </button>
+                  );
+                })()}
 
                 {(isAdmin || isGov) && (
                   <button

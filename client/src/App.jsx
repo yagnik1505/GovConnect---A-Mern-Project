@@ -10,6 +10,7 @@ import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import AdminDashboard from "./pages/AdminDashboard.jsx";
 import SchemesForm from "./pages/SchemesForm.jsx";
 import ScholarshipForm from "./pages/ScholarshipForm.jsx";
+import ReportCrisis from "./pages/ReportCrisis.jsx";
 import "./style.css";
 
 export default function App() {
@@ -39,6 +40,16 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Dedicated crisis reporting page */}
+          <Route
+            path="/report-crisis"
+            element={
+              <ProtectedRoute>
+                <ReportCrisis />
               </ProtectedRoute>
             }
           />

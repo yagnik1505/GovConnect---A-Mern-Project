@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 export default function AdminDashboard() {
   const user = JSON.parse(localStorage.getItem("user")) || {};
@@ -15,14 +16,14 @@ export default function AdminDashboard() {
           <h2 className="text-xl font-semibold mb-2">User Management</h2>
           <p className="text-gray-700">View and manage all registered users.</p>
         </div>
-        <div className="panel panel-admin">
+        <Link to="/schemes" className="panel panel-admin" style={{ textDecoration: "none" }}>
           <h2 className="text-xl font-semibold mb-2">Scheme Control</h2>
-          <p className="text-gray-700">Approve, edit, or remove schemes.</p>
-        </div>
-        <div className="panel panel-admin">
-          <h2 className="text-xl font-semibold mb-2">Reports & Analytics</h2>
-          <p className="text-gray-700">See system-wide statistics and usage.</p>
-        </div>
+          <p className="text-gray-700">Go to Schemes to approve, edit, or remove.</p>
+        </Link>
+        <Link to="/report-crisis" className="panel panel-admin" style={{ textDecoration: "none" }}>
+          <h2 className="text-xl font-semibold mb-2">Report a Crisis</h2>
+          <p className="text-gray-700">Open the crisis reporting and review page.</p>
+        </Link>
       </div>
     </div>
   );

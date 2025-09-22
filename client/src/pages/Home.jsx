@@ -14,8 +14,7 @@ function Home() {
   const publicTiles = [
     { title: "Scholarships", desc: "Browse scholarships", link: "/scholarships" },
     { title: "Schemes", desc: "Explore government schemes", link: "/schemes" },
-    { title: "Profile", desc: "Manage your profile", link: "/profile" },
-    { title: "Report Crisis", desc: "Report an issue to the government", link: "/dashboard" },
+    { title: "Report Crisis", desc: "Report an issue to the government", link: "/report-crisis" },
   ];
 
   const governmentTiles = [

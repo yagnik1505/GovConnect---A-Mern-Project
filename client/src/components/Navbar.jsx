@@ -54,9 +54,11 @@ export default function Navbar() {
 
         {user ? (
           <>
-            <Link to="/dashboard" style={isActive("/dashboard") ? activeBoxStyle : undefined}>
-              Dashboard
-            </Link>
+            {!isAdmin && (
+              <Link to="/dashboard" style={isActive("/dashboard") ? activeBoxStyle : undefined}>
+                Dashboard
+              </Link>
+            )}
 
             {isAdmin && (
               <Link to="/admin/dashboard" style={isActive("/admin") ? activeBoxStyle : undefined}>
