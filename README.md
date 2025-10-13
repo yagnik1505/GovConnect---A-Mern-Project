@@ -1,20 +1,18 @@
 
+
 # GovConnect — Civic Portal (MERN)
 
+GovConnect is a comprehensive MERN stack web application that bridges the gap between citizens and government services. It allows users to:
+- Report local crises with details and images
+- Browse and apply for government schemes and scholarships
+- Track application status
+- Admins can manage users, crises, schemes, and applications via a secure dashboard
 
-GovConnect is a comprehensive web platform built with the MERN stack (MongoDB, Express.js, React, Node.js) designed to bridge the gap between citizens and government services. The portal empowers users to:
-
-- **Report local crises:** Citizens can quickly report emergencies or issues (such as natural disasters, infrastructure failures, or public safety concerns) with detailed descriptions and image uploads, ensuring authorities are promptly informed.
-- **Access and apply for government schemes:** Users can browse, filter, and apply for a variety of government welfare schemes and scholarships, streamlining the application process and increasing transparency.
-- **Track application status:** Applicants can monitor the progress of their submissions for schemes and scholarships in real time.
-- **Admin management:** Government officials and administrators have access to a secure dashboard to review crisis reports, manage scheme and scholarship applications, and oversee user activity.
-- **Secure authentication:** The platform uses JWT-based authentication and role-based access control to ensure data privacy and secure access for both citizens and administrators.
-
-GovConnect aims to modernize civic engagement, making it easier for citizens to interact with government programs and for officials to respond efficiently to community needs.
+The platform uses JWT authentication and role-based access control for security and privacy.
 
 ---
 
-## Backend & Frontend Installation
+## Project Setup Instructions
 
 ### 1. Clone the repository
 ```sh
@@ -23,98 +21,76 @@ cd civic-portal
 ```
 
 ### 2. Install dependencies
-#### Backend (server):
+#### Backend (Express API)
 ```sh
-cd server
+cd backend
 npm install
 ```
-#### Frontend (client):
+#### Frontend (React app)
 ```sh
-cd ../client
+cd ../frontend
 npm install
 ```
 
----
+### 3. Environment Variables
+- Copy `.env.example` to `.env` in both `backend/` and `frontend/` folders.
+- Fill in the required values (see `.env.example` for variable names; do not commit real secrets).
 
-## Environment Variables Setup
-
-1. Copy the following as `server/.env` (see example below):
-	```env
-	PORT=5000
-	MONGO_URI=mongodb://127.0.0.1:27017/civic_portal
-	JWT_SECRET=change_this_secret_key
+### 4. Database Setup
+- To restore the database, run:
+	```sh
+	mongorestore --db civic_portal ./db-backup/civic_portal
 	```
-2. Edit values as needed for your environment.
+- This will populate users, crises, schemes, and other collections.
 
----
-
-## Database Setup
-
-To restore the sample database (using MongoDB tools):
-
-```sh
-mongorestore --db civic_portal ./db-backup/civic_portal
-```
-
-This will populate users, crises, schemes, and other collections.
-
----
-
-## How to Run the Project
-
-### Start Backend
-```sh
-cd server
-npm run dev
-```
-
-### Start Frontend (in a new terminal)
-```sh
-cd client
-npm run dev
-```
-
+### 5. How to Run the Project
+- Start backend:
+	```sh
+	cd backend
+	npm run dev
+	```
+- Start frontend (in a new terminal):
+	```sh
+	cd frontend
+	npm run dev
+	```
 - Backend: http://localhost:5000
 - Frontend: http://localhost:5173
 
 ---
 
-## Admin Credentials (Demo)
 
-- Email: yagnik@gmail.com
-- Password: yagnik1505
+## <span style="color:#1976d2; font-weight:bold">Admin Information</span>
+
+**<span style="color:#1976d2">Admin</span>**: **yagnik@gmail.com**  
+**<span style="color:#1976d2">Password</span>**: **yagnik1505**
 
 ---
 
+
 ## Notes
 - Make sure MongoDB is running locally or update `MONGO_URI` for Atlas/cloud.
+- Do not include `node_modules/`, `dist/`, `build/`, or real `.env` files in your ZIP.
+- Only include `.env.example` files with placeholder values.
 - For more details, see code comments and folder structure.
 
 ---
 
+
 ## Folder Structure
 ```
-civic-portal/
-├── client/           # React frontend
-│   ├── src/
-│   │   ├── api/      # API calls
-│   │   ├── components/ # Reusable UI components
-│   │   ├── pages/    # Page components (Dashboard, Login, etc.)
-│   │   └── utils/    # Utility functions
-│   ├── index.html
-│   ├── package.json
-│   └── vite.config.js
-├── server/           # Node.js/Express backend
-│   ├── src/
-│   │   ├── config/   # Database config
-│   │   ├── middleware/ # Auth and other middleware
-│   │   ├── models/   # Mongoose models
-│   │   ├── routes/   # Express routes
-│   │   └── uploads/  # Uploaded files
-│   └── package.json
-├── hashPassword.js   # Utility script
-├── package.json      # Root package.json (if any)
-└── README.md         # Project documentation
+my-project/
+├─ backend/         # Express + MongoDB API
+│   ├─ src/
+│   ├─ package.json
+│   ├─ .env.example
+├─ frontend/        # React app
+│   ├─ src/
+│   ├─ package.json
+│   ├─ .env.example
+├─ db-backup/       # Database dump or seed data
+├─ README.md        # Setup instructions
+└─ .gitignore
 ```
 
 ## Getting Started
