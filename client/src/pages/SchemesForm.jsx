@@ -92,13 +92,12 @@ const SchemesForm = ({ scheme, onSuccess, onCancel }) => {
                 style={{
                   marginTop: "1rem",
                   // marginLeft: "1rem",
-                  padding: "0.6rem 1rem",
+                  padding: "0.8rem 1.5rem",
                   backgroundColor: "#ccc",
                   border: "none",
                   borderRadius: "8px",
                   cursor: "pointer",
                   fontSize: "1.1rem",
-                  padding: "0.8rem 1.5rem",  
                 }}
               >
                 Cancel

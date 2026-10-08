@@ -1,4 +1,6 @@
 import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { api } from "../utils/api";
 
 export default function Navbar() {
   const navigate = useNavigate();
@@ -6,7 +8,13 @@ export default function Navbar() {
   const user = JSON.parse(localStorage.getItem("user") || "null");
 
   const isAdmin = user?.designation?.toLowerCase() === "admin";
-  const isGov = user?.userType?.toLowerCase() === "government";
+  const [unread, setUnread] = useState(0);
+
+  // Notifications endpoint removed - feature not implemented
+  // useEffect(() => {
+  //   fetchUnread();
+  //   return () => { mounted = false };
+  // }, [user]);
 
   const handleLogout = () => {
     localStorage.removeItem("user");
@@ -65,6 +73,10 @@ export default function Navbar() {
                 Admin Panel
               </Link>
             )}
+
+            <Link to="/notifications" style={isActive("/notifications") ? activeBoxStyle : undefined}>
+              Notifications {unread > 0 && <span className="notif-badge">{unread}</span>}
+            </Link>
 
             <button type="button" onClick={handleLogout} className="logout-btn">
               Logout

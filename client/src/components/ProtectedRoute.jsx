@@ -13,7 +13,7 @@ export default function ProtectedRoute({
   }
 
   const isAdmin = (user.designation || "").toLowerCase() === "admin";
-  const isGov = (user.userType || "").toLowerCase() === "government";
+  const isGovernment = (user.userType || "").toLowerCase() === "government";
 
   // Admin-only routes → block non-admins
   if (adminOnly && !isAdmin) {
@@ -21,7 +21,7 @@ export default function ProtectedRoute({
   }
 
   // Gov or Admin routes → block others
-  if (govOrAdminOnly && !(isAdmin || isGov)) {
+  if (govOrAdminOnly && !(isAdmin || isGovernment)) {
     return <Navigate to="/dashboard" replace />;
   }
 

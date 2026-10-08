@@ -37,7 +37,7 @@ export default function Scholarships() {
         const designation = storedUser?.designation?.toLowerCase().trim() || "user";
         let role = "public";
         if (userType === "government") {
-          role = designation === "admin" ? "admin" : "government";
+          role = designation === "admin" ? "admin" : "officer";
         }
         setUserRole(role);
       } else {
@@ -135,7 +135,7 @@ export default function Scholarships() {
   };
 
   const isAdmin = userRole === "admin";
-  const isGov = userRole === "government";
+  const isGov = userRole === "officer";
 
   return (
     <div className="page-container" style={{ padding: "2rem 0", width: "100%" }}>
@@ -144,7 +144,7 @@ export default function Scholarships() {
       </h1>
 
       <div style={{ maxWidth: "1400px", margin: "0 auto" }}>
-        {(userRole === "admin" || userRole === "government") && (
+        {(userRole === "admin" || userRole === "officer") && (
           <button
             className="add-btn"
             style={{ width: "100%", borderRadius: "1.3rem", fontSize: "1.4rem", marginBottom: "2rem" }}

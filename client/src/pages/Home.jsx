@@ -9,7 +9,7 @@ function Home() {
   const userType = (user.userType || "").toLowerCase();
   const designation = (user.designation || "").toLowerCase();
   const isAdmin = designation === "admin";
-  const isGovEmployee = userType === "government" && !isAdmin;
+  const isGovernment = userType === "government" && !isAdmin;
 
   const publicTiles = [
     { title: "Scholarships", desc: "Browse scholarships", link: "/scholarships" },
@@ -23,13 +23,13 @@ function Home() {
     { title: "See Crises", desc: "View reported crises", link: "/dashboard" },
   ];
 
-  const tiles = isGovEmployee ? governmentTiles : publicTiles;
+  const tiles = isGovernment ? governmentTiles : publicTiles;
 
   return (
     <div className="container">
       {isAdmin ? (
         <h1 className="text-3xl font-bold mb-6">Welcome Admin 🎉</h1>
-      ) : isGovEmployee ? (
+      ) : isGovernment ? (
         <h1 className="text-3xl font-bold mb-6">Welcome Government User 🏛️</h1>
       ) : userType === "public" ? (
         <h1 className="text-3xl font-bold mb-6">Welcome Public User 🙌</h1>
@@ -40,7 +40,7 @@ function Home() {
       {!isAdmin && (
         <div className="grid-3">
           {tiles.map((t) => (
-            <div key={t.title} className={`panel ${isGovEmployee ? "panel-government" : "panel-public"}`} style={{ cursor: "pointer" }} onClick={() => navigate(t.link)}>
+            <div key={t.title} className={`panel ${isGovernment ? "panel-government" : "panel-public"}`} style={{ cursor: "pointer" }} onClick={() => navigate(t.link)}>
               <h2 className="text-xl font-semibold mb-2">{t.title}</h2>
               <p>{t.desc}</p>
             </div>
@@ -49,7 +49,7 @@ function Home() {
       )}
 
       {/* Crisis Statistics Charts - Different views for different user types */}
-      {isGovEmployee ? (
+      {isGovernment ? (
         <GovernmentStats />
       ) : (
         <CrisisStats />

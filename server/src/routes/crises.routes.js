@@ -4,7 +4,7 @@ import { fileURLToPath } from "url";
 import multer from "multer";
 import fs from "fs";
 import Crisis from "../models/Crisis.js";
-import { authMiddleware } from "../middleware/authMiddleware.js";
+import { authMiddleware, govOrAdminMiddleware } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
@@ -25,13 +25,7 @@ function bufferToDataUrl(buffer, mimetype) {
   return `data:${mimetype};base64,${base64}`;
 }
 
-// Helper: only government employees (not admin)
-function governmentEmployeeOnly(req, res, next) {
-  const isGov = (req.user?.userType || "").toLowerCase() === "government";
-  const isAdmin = (req.user?.designation || "").toLowerCase() === "admin";
-  if (isGov && !isAdmin) return next();
-  return res.status(403).json({ success: false, message: "Government employee access required" });
-}
+// NOTE: role checks are handled by middleware `govOrAdminMiddleware`
 
 // Public (authenticated users) can submit a crisis (optional proof image)
 router.post("/", authMiddleware, upload.single("proof"), async (req, res) => {
@@ -75,8 +69,9 @@ router.get("/mine", authMiddleware, async (req, res) => {
   }
 });
 
-// Government employees (non-admin) can list all crises
-router.get("/", authMiddleware, governmentEmployeeOnly, async (req, res) => {
+// Officers and Admin can list all crises
+// Government and Admin can list all crises
+router.get("/", authMiddleware, govOrAdminMiddleware, async (req, res) => {
   try {
     const crises = await Crisis.find()
       .sort({ createdAt: -1 })
@@ -88,44 +83,7 @@ router.get("/", authMiddleware, governmentEmployeeOnly, async (req, res) => {
   }
 });
 
-// Government employees (non-admin) can resolve with proof image
-router.post("/:id/resolve", authMiddleware, governmentEmployeeOnly, upload.single("proof"), async (req, res) => {
-  try {
-    const dataUrl = req.file ? bufferToDataUrl(req.file.buffer, req.file.mimetype) : undefined;
-    const update = { status: "completed" };
-    if (dataUrl) update.resolutionProofDataUrl = dataUrl;
-
-    const updated = await Crisis.findByIdAndUpdate(req.params.id, update, { new: true });
-    if (!updated) return res.status(404).json({ success: false, message: "Crisis not found" });
-    return res.json({ success: true, crisis: updated });
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ success: false, message: "Failed to resolve crisis" });
-  }
-});
-
-// Government employees (non-admin) can update status
-router.patch("/:id/status", authMiddleware, governmentEmployeeOnly, async (req, res) => {
-  try {
-    const { status } = req.body;
-    const allowed = ["pending", "completed"];
-    if (!allowed.includes(status)) {
-      return res.status(400).json({ success: false, message: "Invalid status" });
-    }
-    const updated = await Crisis.findByIdAndUpdate(
-      req.params.id,
-      { status },
-      { new: true }
-    );
-    if (!updated) return res.status(404).json({ success: false, message: "Crisis not found" });
-    return res.json({ success: true, crisis: updated });
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ success: false, message: "Failed to update status" });
-  }
-});
-
-// Get crisis statistics for charts (public endpoint)
+// Get crisis statistics for charts (public endpoint) - MUST be before /:id route
 router.get("/stats", async (req, res) => {
   try {
     // Get crisis type distribution
@@ -167,5 +125,45 @@ router.get("/stats", async (req, res) => {
     res.status(500).json({ success: false, message: "Failed to fetch crisis statistics" });
   }
 });
+
+// Get single crisis by id (officer/admin or owner)
+router.get("/:id", authMiddleware, async (req, res) => {
+  try {
+    const crisis = await Crisis.findById(req.params.id).populate("createdBy", "name email userType designation");
+    if (!crisis) return res.status(404).json({ success: false, message: "Crisis not found" });
+
+    // allow if owner or government/admin
+    const isOwner = crisis.createdBy && crisis.createdBy._id.toString() === req.user.id;
+    const userType = (req.user.userType || "").toLowerCase();
+    const designation = (req.user.designation || "").toLowerCase();
+    const isGovOrAdmin = userType === "government" || designation === "admin";
+    if (!isOwner && !isGovOrAdmin) return res.status(403).json({ success: false, message: "Access denied" });
+
+    return res.json({ success: true, crisis });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ success: false, message: "Failed to fetch crisis" });
+  }
+});
+
+// Government employees (non-admin) can resolve with proof image
+// Government/Admin can resolve with proof image
+router.post("/:id/resolve", authMiddleware, govOrAdminMiddleware, upload.single("proof"), async (req, res) => {
+  try {
+    const dataUrl = req.file ? bufferToDataUrl(req.file.buffer, req.file.mimetype) : undefined;
+    const update = { status: "RESOLVED", resolvedAt: new Date() };
+    if (dataUrl) update.resolutionProofDataUrl = dataUrl;
+
+    const updated = await Crisis.findByIdAndUpdate(req.params.id, update, { new: true });
+    if (!updated) return res.status(404).json({ success: false, message: "Crisis not found" });
+    return res.json({ success: true, crisis: updated });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ success: false, message: "Failed to resolve crisis" });
+  }
+});
+
+// Officers/Admin can update status
+// Status and assignment workflows removed to restore stable baseline
 
 export default router; 

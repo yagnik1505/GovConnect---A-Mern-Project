@@ -53,11 +53,9 @@ export default function Login() {
         })
       );
 
-      // Navigation based on the composite role
-      if (userType === "government" && designation === "admin") {
+      // Navigation based on the role
+      if (designation === "admin") {
         navigate("/admin/dashboard", { replace: true });
-      } else if (userType === "government") {
-        navigate("/", { replace: true });
       } else {
         navigate("/dashboard", { replace: true });
       }

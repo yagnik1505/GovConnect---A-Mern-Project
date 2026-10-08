@@ -5,7 +5,7 @@ import { api, BASE_URL } from "../utils/api";
 export default function Dashboard() {
   const user = JSON.parse(localStorage.getItem("user")) || {};
   const isAdmin = (user.designation || "").toLowerCase() === "admin";
-  const isGovEmployee = (user.userType || "").toLowerCase() === "government" && !isAdmin;
+  const isGovEmployee = (user.userType || "").toLowerCase() === "government" || isAdmin;
   const navigate = useNavigate();
 
   const [crises, setCrises] = useState([]);
@@ -118,7 +118,7 @@ export default function Dashboard() {
       </p>
 
       {/* Public users: Crisis submission */}
-      {((user.userType || "").toLowerCase() !== "government") && (
+      {!isGovEmployee && (
         <div className="panel panel-public" style={{ marginBottom: "2rem" }}>
           <h2 className="text-xl font-semibold mb-2">Report a Crisis</h2>
           <p className="text-gray-600" style={{ marginBottom: "1rem" }}>Let the government know about an issue in your area.</p>
@@ -175,7 +175,7 @@ export default function Dashboard() {
       )}
 
       {/* Public users: My Reports */}
-      {((user.userType || "").toLowerCase() !== "government") && (
+      {!isGovEmployee && (
         <div className="panel panel-public" style={{ marginBottom: "2rem" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
             <h2 className="text-xl font-semibold">My Reports</h2>
@@ -208,7 +208,7 @@ export default function Dashboard() {
                       {renderProof(c)}
                     </div>
                   ) : null}
-                  {c.status === "completed" && (c.resolutionProofDataUrl || c.resolutionProofUrl) && (
+                  {(String(c.status || "").toUpperCase() === "RESOLVED") && (c.resolutionProofDataUrl || c.resolutionProofUrl) && (
                     <div style={{ marginTop: "0.6rem" }}>
                       <p style={{ fontWeight: 600, marginBottom: "0.3rem" }}>Government resolution proof:</p>
                       {renderResolutionProof(c)}
@@ -221,7 +221,7 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* Government employees (not admin): Crisis list */}
+      {/* Government employees: Crisis list */}
       {isGovEmployee && (
         <div className="panel panel-government" style={{ paddingTop: "0.5rem" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
