@@ -1,12 +1,10 @@
+import fs from "fs";
 import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import cors from "cors";
 import path from "path";
 import { fileURLToPath } from "url";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 import authRoutes from "./routes/auth.routes.js";
 import schemesRoutes from "./routes/schemes.routes.js";
@@ -17,60 +15,112 @@ import crisesRoutes from "./routes/crises.routes.js";
 import { authMiddleware, adminMiddleware } from "./middleware/authMiddleware.js";
 
 dotenv.config();
+
 const app = express();
 
-// CORS & JSON parsing middleware
-// Allow the dev client to run on any localhost port used by Vite (dynamic),
-// reflect the request origin when running in development.
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Startup validation
+if (!process.env.MONGO_URI || !process.env.JWT_SECRET) {
+  console.error("FATAL ERROR: MONGO_URI and JWT_SECRET are required.");
+  process.exit(1);
+}
+
+// CORS
+const allowedOrigins = process.env.CLIENT_URL
+  ? process.env.CLIENT_URL.split(",").map(url => url.trim().replace(/\/$/, ""))
+  : ["http://localhost:5173"];
+
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "http://localhost:5173", // Allow Vercel or localhost
+    origin: (origin, cb) => {
+      if (!origin) return cb(null, true);
+
+      if (
+        allowedOrigins.includes(origin) ||
+        origin.startsWith("http://localhost")
+      ) {
+        return cb(null, true);
+      }
+
+      return cb(new Error("Not allowed by CORS"));
+    },
     credentials: true,
   })
 );
+
 app.use(express.json());
 
-// Static uploads directory
-app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
+// Uploads Folder
+const uploadsDir = path.join(__dirname, "../uploads");
 
-// Public routes
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
+
+app.use("/uploads", express.static(uploadsDir));
+
+// Routes
 app.use("/api/auth", authRoutes);
 
-// Protected sample routes with middleware
-app.get("/api/admin/dashboard", authMiddleware, adminMiddleware, (req, res) => {
-  res.json({ message: `Welcome Admin ${req.user.id}` });
-});
+app.get(
+  "/api/admin/dashboard",
+  authMiddleware,
+  adminMiddleware,
+  (req, res) => {
+    res.json({
+      message: `Welcome Admin ${req.user.id}`,
+    });
+  }
+);
 
 app.get("/api/profile", authMiddleware, (req, res) => {
-  res.json({ message: `Welcome ${req.user.userType} ${req.user.designation}` });
+  res.json({
+    message: `Welcome ${req.user.userType} ${req.user.designation}`,
+  });
 });
 
-// Resource routes
 app.use("/api/schemes", schemesRoutes);
 app.use("/api/scholarships", scholarshipsRoutes);
 app.use("/api/apply", applyRoutes);
 app.use("/api/crises", crisesRoutes);
 
-// Health check route
+// Health Route
 app.get("/health", (req, res) => {
-  res.status(200).json({ status: "OK", message: "Server is running" });
+  res.status(200).json({
+    status: "OK",
+    message: "Server is running",
+  });
 });
 
-// Connect to MongoDB and start server
 const PORT = process.env.PORT || 5000;
+
+// Mongo Connection
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {
-    console.log("MongoDB connected");
-    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-  })
-  .catch((err) => console.error("MongoDB connection error:", err));
+    console.log("✅ MongoDB Atlas Connected");
+    console.log("Database:", mongoose.connection.name);
+    console.log("Host:", mongoose.connection.host);
 
-// Global error handling middleware (last)
+    app.listen(PORT, () => {
+      console.log(`🚀 Server running on port ${PORT}`);
+    });
+  })
+  .catch(err => {
+    console.error("MongoDB Error:", err);
+  });
+
+// Error Handler
 app.use((err, req, res, next) => {
-  console.error("Unhandled error:", err.stack);
+  console.error(err);
+
   res.status(err.status || 500).json({
     success: false,
-    message: err.message || "Internal Server Error",
+    message:
+      process.env.NODE_ENV === "production"
+        ? "Internal Server Error"
+        : err.message,
   });
 });

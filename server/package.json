@@ -3,11 +3,13 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "nodemon src/index.js"
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "seed": "node src/seed.js",
+    "migrate": "node src/migrateItemId.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
-    "civic-portal": "file:..",
     "cors": "^2.8.5",
     "dotenv": "^16.6.1",
     "express": "^4.21.2",
@@ -18,9 +20,12 @@
   "devDependencies": {
     "nodemon": "^3.1.10"
   },
-  "main": "index.js",
+  "main": "src/index.js",
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": ""
+  "description": "",
+  "engines": {
+    "node": ">=18"
+  }
 }
