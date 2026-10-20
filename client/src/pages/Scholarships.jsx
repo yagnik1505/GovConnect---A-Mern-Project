@@ -26,9 +26,9 @@ export default function Scholarships() {
   const getUserRole = async () => {
     try {
       const token = localStorage.getItem("token");
-      const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
+      const storedUser = JSON.parse(localStorage.getItem("user") || "null");
       
-      if (token && storedUser) {
+      if (token && storedUser?.email && storedUser?.name) {
         setIsLoggedIn(true);
         setCurrentUser(storedUser);
         setApplicationData({ name: storedUser.name || "", email: storedUser.email || "" });
@@ -59,8 +59,9 @@ export default function Scholarships() {
   const submitApplication = async (e) => {
     e.preventDefault();
     
-    // Check if user is logged in
-    if (!isLoggedIn) {
+    // Check if user is logged in (token + registered profile, not an empty localStorage object)
+    const token = localStorage.getItem("token");
+    if (!token || !isLoggedIn || !currentUser?.email) {
       alert("Please login to apply for scholarships");
       return;
     }

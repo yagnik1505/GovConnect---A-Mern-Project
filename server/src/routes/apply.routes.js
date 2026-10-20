@@ -3,14 +3,15 @@ import mongoose from "mongoose";
 import Application from "../models/Application.js";
 import Scheme from "../models/Scheme.js";
 import Scholarship from "../models/Scholarship.js";
+import User from "../models/User.js";
 import { authMiddleware } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
 router.post("/", authMiddleware, async (req, res) => {
-  const { itemId, itemType, title, name, email } = req.body;
+  const { itemId, itemType, title, name: bodyName, email: bodyEmail } = req.body;
 
-  if (!itemId || !itemType || !title || !name || !email) {
+  if (!itemId || !itemType || !title || !bodyName || !bodyEmail) {
     return res.status(400).json({ success: false, message: "Missing required fields." });
   }
 
@@ -19,6 +20,18 @@ router.post("/", authMiddleware, async (req, res) => {
   }
 
   try {
+    if (!req.user?.id) {
+      return res.status(401).json({ success: false, message: "No token provided" });
+    }
+
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(401).json({ success: false, message: "Token is not valid" });
+    }
+
+    const name = user.name;
+    const email = user.email;
+
     const objectId = new mongoose.Types.ObjectId(itemId);
 
     // Enforce item status rules: only allow apply if active/open

@@ -10,7 +10,11 @@ export const authMiddleware = (req, res, next) => {
   const token = header.slice(7);
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || "secretkey");
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    if (!decoded?.id) {
+      return res.status(401).json({ success: false, message: "Token is not valid" });
+    }
 
     req.user = {
       id: decoded.id,
